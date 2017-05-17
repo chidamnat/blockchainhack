@@ -67,7 +67,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get -y upgrade
-    apt-get install -y python-pip golang-go
+    apt-get install -y python-pip golang-go nodejs npm
     apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
     apt-add-repository 'deb https://apt.dockerproject.org/repo ubuntu-xenial main' -y
     apt-get -y update 
