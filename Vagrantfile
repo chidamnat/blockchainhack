@@ -9,11 +9,7 @@ Vagrant.configure("2") do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
-  if Vagrant.has_plugin?("vagrant-proxyconf")
-    config.proxy.http     = "http://www-proxy.us.oracle.com:80"
-    config.proxy.https    = "https://www-proxy.us.oracle.com:80"
-    config.proxy.no_proxy = "localhost,127.0.0.1"
-  end 
+  
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/xenial64"
