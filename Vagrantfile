@@ -76,4 +76,12 @@ Vagrant.configure("2") do |config|
     usermod -aG docker $(whoami)
     yes | pip install docker-compose
   SHELL
+
+  config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    mkdir /home/ubuntu/.go
+    echo "export GOPATH=/home/ubuntu/.go" >> /home/ubuntu/.bashrc
+    export GOPATH=/home/ubuntu/.go
+    mkdir -p $GOPATH/github.com/hyperledger
+    git clone -b v0.6 http://gerrit.hyperledger.org/r/fabric.git $GOPATH/github.com/hyperledger/fabric
+  SHELL
 end
