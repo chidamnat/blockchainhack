@@ -18,26 +18,26 @@ type PatientInfo struct {
 	Zipcd  string `json:"zipcd"`
 	State       string `json:"state"`
 	Birthdate     string `json:"birthdate"`
-	lastModifiedDate    string `json:"lastmodifieddate"`
-	createDate   string `json:"createdate"`
+	LastModifiedDate    string `json:"lastmodifieddate"`
+	CreateDate   string `json:"createdate"`
 }
 
 type InsuranceInfo struct {
-	provider      int `json:"provider"`
+	Provider      int `json:"provider"`
 }
 
 type ClaimInfo struct {
-	claimInfo              string        `json:"id"`
-	patientId             string        `json:"propertyId"`
+	ClaimInfo              string        `json:"id"`
+	PatientId             string        `json:"propertyId"`
 	DateOfVisit           string        `json:"dateOfVisit"`
 	NPI                   string        `json:"npi"`
 	CPT                string        `json:"cpt"`
 	ICD10                 string        `json:"icd10"`
 	NDC                   string        `json:"ndc"`
-	patientInfo           PatientInfo    `json:"personalInfo"`
-	insuranceInfo          InsuranceInfo `json:"insuranceInfo"`
+	PatientInfo           PatientInfo    `json:"personalInfo"`
+	InsuranceInfo          InsuranceInfo `json:"insuranceInfo"`
 	Cost                 string        `json:"cost"`
-	procedureStatus      string        `json:"procedureStatus"`
+	ProcedureStatus      string        `json:"procedureStatus"`
 }
 
 func GetLoanApplication(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
