@@ -19,7 +19,7 @@ type PatientInfo struct {
 	State       string `json:"state"`
 	Birthdate     string `json:"birthdate"`
 	lastModifiedDate    string `json:"lastmodifieddate"`
-	createDate   String `json:"createdate"`
+	createDate   string `json:"createdate"`
 }
 
 type InsuranceInfo struct {
@@ -37,7 +37,7 @@ type ClaimInfo struct {
 	patientInfo           PatientInfo    `json:"personalInfo"`
 	insuranceInfo          InsuranceInfo `json:"insuranceInfo"`
 	Cost                 string        `json:"cost"`
-	procedureStatus      String        `json:"procedureStatus"`
+	procedureStatus      string        `json:"procedureStatus"`
 }
 
 func GetLoanApplication(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
