@@ -78,10 +78,10 @@ Vagrant.configure("2") do |config|
   SHELL
 
   config.vm.provision "shell", privileged: false, inline: <<-SHELL
+    rm -rf /home/ubuntu/.go
     mkdir /home/ubuntu/.go
     echo "export GOPATH=/home/ubuntu/.go" >> /home/ubuntu/.bashrc
     export GOPATH=/home/ubuntu/.go
-    rm -rf $GOPATH/github.com
     mkdir -p $GOPATH/src/github.com/hyperledger
     git clone -b v0.6 http://gerrit.hyperledger.org/r/fabric.git $GOPATH/src/github.com/hyperledger/fabric
     mkdir -p $GOPATH/src/alm.oraclecorp.com/oaux-innovation-labs
