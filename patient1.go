@@ -1,11 +1,11 @@
 package main
 
 import (
+    "time"
     "errors"
     "fmt"
     "strconv"
-	  "encoding/json"
-    //"strings"
+      "encoding/json"
     "github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
@@ -16,12 +16,13 @@ type SampleChaincode struct {
 
 //custom data models
 type PatientInfo struct {
-    PatientId string `json:"patientid"`
-    Zipcd  string `json:"zipcd"`
-    State       string `json:"state"`
-    Birthdate     string `json:"birthdate"`
-    LastModifiedDate    string `json:"lastmodifieddate"`
-    CreateDate   string `json:"createdate"`
+    PatientId             string       `json:"patientid"`
+    Zipcd                 string       `json:"zipcd"`
+    State                 string       `json:"state"`
+    Birthdate             string       `json:"birthdate"`
+    ClaimHistory          []string     `json:claimhistory`
+    LastModifiedDate      time.Time    `json:"lastmodifieddate"`
+    CreatedDate           time.Time    `json:"createdate"`
 }
 
 type ClaimInfo struct {
@@ -32,14 +33,11 @@ type ClaimInfo struct {
     CPT                   string       `json:"cpt"`
     ICD10                 string       `json:"icd10"`
     NDC                   string       `json:"ndc"`
-    //PatientInfo           PatientInfo    `json:"personalInfo"`
     PatientInfo           string       `json:"personalInfo"`
-    //InsuranceInfo          InsuranceInfo `json:"insuranceInfo"`
-    InsuranceInfo        string        `json:"insuranceInfo"`
-    Cost                 string        `json:"cost"`
-    ProcedureStatus      string        `json:"procedureStatus"`
+    InsuranceInfo         string        `json:"insuranceInfo"`
+    Cost                  string        `json:"cost"`
+    ProcedureStatus       string        `json:"procedureStatus"`
 }
-var accountIndexStr = "_accountindex"	  // Define an index varibale to track all the accounts stored in the world state
 
 func GetPatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     logger.Debug("Entering GetPatientInfo")
@@ -50,15 +48,15 @@ func GetPatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
     }
 
     var patientID = args[0]
-    bytes, err := stub.GetState(patientID)
+    patientInfoJSON, err := stub.GetState(patientID)
     if err != nil {
         logger.Error("Could not fetch patient info with id "+patientID+" from ledger", err)
         return nil, err
     }
-    return bytes, nil
+    return patientInfoJSON, nil
 }
 
-func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+func GetPatientClaimHistory(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     logger.Debug("Entering GetCompletePatientInfo")
 
     if len(args) < 1 {
@@ -67,33 +65,33 @@ func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]
     }
 
     var patientID = args[0]
-    bytes, err := stub.GetState(patientID)
+    var patientInfo PatientInfo
+    patientInfoRaw, err := stub.GetState(patientID)
+    json.Unmarshal(patientInfoRaw, &patientInfo)
     if err != nil {
         logger.Error("Could not fetch patient info with id "+patientID+" from ledger", err)
         return nil, err
     }
-    return bytes, nil
 
-    //get the account index
-  	// accountsAsBytes, err := stub.GetState(accountIndexStr)
-  	// if err != nil {
-  	// 	return nil, errors.New("Failed to get account index")
-  	// }
-  	// var accountIndex []string
-    // var tempSlice []string
-  	// json.Unmarshal(accountsAsBytes, &accountIndex)
-    //
-    // for i,val := range accountIndex{
-    //     var m ClaimInfo
-    //     var claimOut []byte
-    //     claimOut, _ = GetClaimInfo(stub,strings.Fields(val))
-    //     json.Unmarshal(claimOut, &m)
-		//     if m.PatientId == patientID {
-    //       accountIndex = append(tempSlice , accountIndex[i])
-    //     }
-    // }
-    // jsonAsBytes, _ := json.Marshal(accountIndex)
-    // return jsonAsBytes, nil
+    var claimHistoryArr []string
+    var claimID string
+    var claimInfoRaw []byte
+    var claimInfoJSON string
+
+    for i := 0; i < len(patientInfo.ClaimHistory); i++ {
+          claimID = patientInfo.ClaimHistory[i]
+          claimInfoRaw, err = stub.GetState(claimID)
+          claimInfoJSON = string(claimInfoRaw)
+          if err != nil {
+            logger.Error("Could not fetch claim info with id "+claimID+" from ledger", err)
+            return nil, err
+          }
+          claimHistoryArr = append(claimHistoryArr, claimInfoJSON)
+    }
+
+    var claims []byte
+    claims, err = json.Marshal(claimHistoryArr)
+    return claims, nil
 }
 
 func GetClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
@@ -105,12 +103,13 @@ func GetClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, erro
     }
 
     var claimId = args[0]
-    bytes, err := stub.GetState(claimId)
+    claimInfoJSON, err := stub.GetState(claimId)
     if err != nil {
         logger.Error("Could not fetch patient info with id "+claimId+" from ledger", err)
         return nil, err
     }
-    return bytes, nil
+
+    return claimInfoJSON, nil
 }
 
 func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
@@ -120,17 +119,23 @@ func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte,
         logger.Error("Invalid number of args")
         return nil, errors.New("Expected at least two arguments for patient info creation.")
     }
-
     var patientID = args[0]
-    //var patientInfoInput = args[1]
-    var zipcd = args[1]
-    var state = args[2]
-    var birthdate = args[3]
-    var lastmodifieddate = args[4]
-    var createdate = args[5]
-    patientInfoInput := `{ "zipcd": "` + zipcd + `","state": "` + state + `", "birthdate": "` + birthdate + `", "lastmodifieddate": "` + lastmodifieddate + `" ,"createdate": "` + createdate + `"}`
 
-    err := stub.PutState(patientID, []byte(patientInfoInput))
+    var patientInfo *PatientInfo
+
+    patientInfo = &PatientInfo{
+      PatientId: patientID,
+      Zipcd: args[1],
+      State: args[2],
+      Birthdate: args[3],
+      ClaimHistory: make([]string, 0),
+      LastModifiedDate: time.Now(),
+      CreatedDate: time.Now(),
+    }
+
+    patientInfoJSON, err := json.Marshal(patientInfo)
+
+    err = stub.PutState(patientID, patientInfoJSON)
     if err != nil {
         logger.Error("Could not save patient info to ledger", err)
         return nil, err
@@ -145,40 +150,47 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
         logger.Error("Invalid number of args")
         return nil, errors.New("Expected at least two arguments for claim info creation.")
     }
-    var claimId = args[0]
-    var patientId = args[1]
-    var dateOfVisit = args[2]
-    var npi = args[3]
-    var cpt = args[4]
-    var icd10 = args[5]
-    var ndc = args[6]
-    //var personalInfo = GetPatientInfo(stub, args[7])
-    var insuranceInfo = args[7]
-    var cost = args[8]
-    var procedureStatus = args[9]
 
-    claimInfoInput := `{ "patientId": "` + patientId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt + `", "icd10": "` + icd10 + `", "ndc": "` + ndc +  `","insuranceInfo": "` + insuranceInfo + `", "cost": "` + cost + `", "procedureStatus": "` + procedureStatus + `"}`
-    //var claimInfoInput = args[1]
+    var claimID = args[0]
+    var patientID = args[1]
 
-    err := stub.PutState(claimId, []byte(claimInfoInput))
+    var claimInfo = &ClaimInfo{
+      ClaimInfo: claimID,
+      PatientId: patientID,
+      DateOfVisit: args[2],
+      NPI: args[3],
+      CPT: args[4],
+      ICD10: args[5],
+      NDC: args[6],
+      InsuranceInfo: args[7],
+      Cost: args[8],
+      ProcedureStatus: args[9],
+    }
+
+    claimInfoJSON, err := json.Marshal(claimInfo)
+    err = stub.PutState(claimID, claimInfoJSON)
     if err != nil {
         logger.Error("Could not save claim info to ledger", err)
         return nil, err
     }
 
-    //get the account index
-  	accountsAsBytes, err := stub.GetState(accountIndexStr)
-  	if err != nil {
-  		return nil, errors.New("Failed to get account index")
-  	}
-  	var accountIndex []string
-  	json.Unmarshal(accountsAsBytes, &accountIndex)
+    //Update PatientInfo.ClaimHistory
+    patientInfoJSONOld, err := stub.GetState(patientID)
+    if err != nil {
+        logger.Error("Could not retrieve patient info", err)
+        return nil, err
+    }
 
-    //append the index
-  	accountIndex = append(accountIndex, claimId)
-  	jsonAsBytes, _ := json.Marshal(accountIndex)
-  	err = stub.PutState(accountIndexStr, jsonAsBytes)
-
+    var patientInfo PatientInfo
+    json.Unmarshal(patientInfoJSONOld, &patientInfo)
+    patientInfo.ClaimHistory = append(patientInfo.ClaimHistory, claimID)
+    patientInfo.LastModifiedDate = time.Now()
+    patientInfoJSONNew, err := json.Marshal(patientInfo)
+    err = stub.PutState(patientID, patientInfoJSONNew)
+    if err != nil {
+        logger.Error("Could not save patient info to ledger", err)
+        return nil, err
+    }
     logger.Info("Successfully saved patient info.")
     return nil, nil
 
@@ -204,13 +216,6 @@ func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface, function string
       return nil, err
     }
 
-    var empty []string
-    jsonAsBytes, _ := json.Marshal(empty)								//marshal an emtpy array of strings to clear the account index
-    err = stub.PutState(accountIndexStr, jsonAsBytes)
-    if err != nil {
-      return nil, err
-    }
-
     return nil, nil
 }
 
@@ -222,10 +227,6 @@ func (t *SampleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
     if function == "GetClaimInfo" {
         return GetClaimInfo(stub, args)
     }
-    if function == "GetCompletePatientInfo" {
-        return GetCompletePatientInfo(stub, args)
-    }
-
     return nil, nil
 }
 
