@@ -22,10 +22,10 @@ type PatientInfo struct {
     LastModifiedDate    string `json:"lastmodifieddate"`
     CreateDate   string `json:"createdate"`
 }
-
-type InsuranceInfo struct {
-    Provider      int `json:"provider"`
-}
+//
+// type InsuranceInfo struct {
+//     Provider      int `json:"provider"`
+// }
 
 type ClaimInfo struct {
     ClaimInfo             string       `json:"id"`
@@ -81,7 +81,7 @@ func GetClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, erro
 func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     logger.Debug("Entering CreatePatientInfo")
 
-    if len(args) < 2 {
+    if len(args) < 6 {
         logger.Error("Invalid number of args")
         return nil, errors.New("Expected at least two arguments for patient info creation.")
     }
@@ -106,7 +106,7 @@ func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte,
 
 func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     logger.Debug("Entering CreateClaimInfo")
-    if len(args) < 2 {
+    if len(args) < 10 {
         logger.Error("Invalid number of args")
         return nil, errors.New("Expected at least two arguments for claim info creation.")
     }
