@@ -79,6 +79,7 @@ func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]
   		return nil, errors.New("Failed to get account index")
   	}
   	var accountIndex []string
+    var tempSlice []string
   	json.Unmarshal(accountsAsBytes, &accountIndex)
 
     for i,val := range accountIndex{
@@ -88,7 +89,7 @@ func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]
         json.Unmarshal(claimOut, &m)
         //json.Unmarshal(GetClaimInfo(stub,val), &m)
 		    if m.PatientId == patientID {
-          accountIndex = append([]string , accountIndex[i])
+          accountIndex = append(tempSlice , accountIndex[i])
         }
     }
     jsonAsBytes, _ := json.Marshal(accountIndex)
