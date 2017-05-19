@@ -59,6 +59,23 @@ func GetPatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, er
     return bytes, nil
 }
 
+func GetClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+    logger.Debug("Entering GetClaimInfo")
+
+    if len(args) < 1 {
+        logger.Error("Invalid number of arguments")
+        return nil, errors.New("Missing patient ID")
+    }
+
+    var claimId = args[0]
+    bytes, err := stub.GetState(claimId)
+    if err != nil {
+        logger.Error("Could not fetch patient info with id "+claimId+" from ledger", err)
+        return nil, err
+    }
+    return bytes, nil
+}
+
 func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     logger.Debug("Entering CreatePatientInfo")
 
@@ -74,7 +91,6 @@ func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte,
     var birthdate = args[3]
     var lastmodifieddate = args[4]
     var createdate = args[5]
-//    patientInfoInput := `{ "state": "` + state + `", "birthdate": "` + birthdate + `", "lastmodifieddate": "` + lastmodifieddate + `" }`
     patientInfoInput := `{ "zipcd": "` + zipcd + `","state": "` + state + `", "birthdate": "` + birthdate + `", "lastmodifieddate": "` + lastmodifieddate + `" ,"createdate": "` + createdate + `"}`
 
     err := stub.PutState(patientID, []byte(patientInfoInput))
@@ -83,11 +99,7 @@ func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte,
         return nil, err
     }
 
-    // var customEvent = "{eventType: 'patientInfoCreation', description: " + patientID + "' Successfully created'}"
-    // err = stub.SetEvent("evtSender", []byte(customEvent))
-    // if err != nil {
-    //     return nil, err
-    // }
+
     logger.Info("Successfully saved patient info.")
     return nil, nil
 
@@ -102,7 +114,20 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
     }
 
     var claimId = args[0]
-    var claimInfoInput = args[1]
+    var propertyId = args[1]
+    var dateOfVisit = args[2]
+    var npi = args[3]
+    var cpt = args[4]
+    var icd10 = args[5]
+    var ndc = args[6]
+    var personalInfo = GetPatientInfo(stub, args[7])
+    var insuranceInfo = args[8]
+    var cost = args[9]
+    var procedureStatus = args[10]
+
+    claimInfoInput := `{ "id": "` + claimId + `","propertyId": "` + propertyId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `" ,"cpt": "` + cpt  `", "icd10": "` + icd10 `", "ndc": "` + ndc `", "personalInfo": "` + personalInfo `","insuranceInfo": "` + insuranceInfo `", "cost": "` + cost `", "procedureStatus": "` + procedureStatus `"}`
+
+    //var claimInfoInput = args[1]
 
     err := stub.PutState(claimId, []byte(claimInfoInput))
     if err != nil {
@@ -110,11 +135,7 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
         return nil, err
     }
 
-    // var customEvent = "{eventType: 'claimInfoCreation', description: " + claimId + "' Successfully created'}"
-    // err = stub.SetEvent("evtSender", []byte(customEvent))
-    // if err != nil {
-    //     return nil, err
-    // }
+
     logger.Info("Successfully saved patient info.")
     return nil, nil
 
@@ -155,6 +176,9 @@ func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 func (t *SampleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
     if function == "GetPatientInfo" {
         return GetPatientInfo(stub, args)
+    }
+    if function == "GetClaimInfo" {
+        return GetClaimInfo(stub, args)
     }
     return nil, nil
 }
