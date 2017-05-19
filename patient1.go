@@ -22,10 +22,6 @@ type PatientInfo struct {
     LastModifiedDate    string `json:"lastmodifieddate"`
     CreateDate   string `json:"createdate"`
 }
-//
-// type InsuranceInfo struct {
-//     Provider      int `json:"provider"`
-// }
 
 type ClaimInfo struct {
     ClaimInfo             string       `json:"id"`
@@ -46,6 +42,23 @@ var accountIndexStr = "_accountindex"	  // Define an index varibale to track all
 
 func GetPatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     logger.Debug("Entering GetPatientInfo")
+
+    if len(args) < 1 {
+        logger.Error("Invalid number of arguments")
+        return nil, errors.New("Missing patient ID")
+    }
+
+    var patientID = args[0]
+    bytes, err := stub.GetState(patientID)
+    if err != nil {
+        logger.Error("Could not fetch patient info with id "+patientID+" from ledger", err)
+        return nil, err
+    }
+    return bytes, nil
+}
+
+func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+    logger.Debug("Entering GetCompletePatientInfo")
 
     if len(args) < 1 {
         logger.Error("Invalid number of arguments")
@@ -131,6 +144,18 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
         return nil, err
     }
 
+    //get the account index
+  	accountsAsBytes, err := stub.GetState(accountIndexStr)
+  	if err != nil {
+  		return nil, errors.New("Failed to get account index")
+  	}
+  	var accountIndex []string
+  	json.Unmarshal(accountsAsBytes, &accountIndex)
+
+    //append the index
+  	accountIndex = append(accountIndex, accountNo)
+  	jsonAsBytes, _ := json.Marshal(accountIndex)
+  	err = stub.PutState(accountIndexStr, jsonAsBytes)
 
     logger.Info("Successfully saved patient info.")
     return nil, nil
@@ -168,7 +193,6 @@ func (t *SampleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 }
 
 
-
 func (t *SampleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
     if function == "GetPatientInfo" {
         return GetPatientInfo(stub, args)
@@ -191,10 +215,6 @@ func (t *SampleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
     return nil, nil
 }
 
-// type customEvent struct {
-//     Type       string `json:"type"`
-//     Decription string `json:"description"`
-// }
 
 func main() {
 
