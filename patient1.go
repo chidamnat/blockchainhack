@@ -222,6 +222,10 @@ func (t *SampleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
     if function == "GetClaimInfo" {
         return GetClaimInfo(stub, args)
     }
+    if function == "GetCompletePatientInfo" {
+        return GetCompletePatientInfo(stub, args)
+    }
+
     return nil, nil
 }
 
