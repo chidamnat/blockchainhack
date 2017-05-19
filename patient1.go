@@ -67,34 +67,34 @@ func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]
     }
 
     var patientID = args[0]
-    bytes, err := stub.GetState(patientID)
-    if err != nil {
-        logger.Error("Could not fetch patient info with id "+patientID+" from ledger", err)
-        return nil, err
-    }
-    return bytes, nil
-
-    //get the account index
-  	// accountsAsBytes, err := stub.GetState(accountIndexStr)
-  	// if err != nil {
-  	// 	return nil, errors.New("Failed to get account index")
-  	// }
-  	// var accountIndex []string
-    // var tempSlice []string
-  	// json.Unmarshal(accountsAsBytes, &accountIndex)
-    //
-    // for i,val := range accountIndex{
-    //     var m ClaimInfo
-    //     var claimOut []byte
-    //     claimOut, _ = GetClaimInfo(stub,strings.Fields(val))
-    //     json.Unmarshal(claimOut, &m)
-    //     //json.Unmarshal(GetClaimInfo(stub,val), &m)
-		//     if m.PatientId == patientID {
-    //       accountIndex = append(tempSlice , accountIndex[i])
-    //     }
+    // bytes, err := stub.GetState(patientID)
+    // if err != nil {
+    //     logger.Error("Could not fetch patient info with id "+patientID+" from ledger", err)
+    //     return nil, err
     // }
-    // jsonAsBytes, _ := json.Marshal(accountIndex)
-    // return jsonAsBytes, nil
+    // return bytes, nil
+
+    get the account index
+  	accountsAsBytes, err := stub.GetState(accountIndexStr)
+  	if err != nil {
+  		return nil, errors.New("Failed to get account index")
+  	}
+  	var accountIndex []string
+    var tempSlice []string
+  	json.Unmarshal(accountsAsBytes, &accountIndex)
+
+    for i,val := range accountIndex{
+        var m ClaimInfo
+        var claimOut []byte
+        claimOut, _ = GetClaimInfo(stub,strings.Fields(val))
+        json.Unmarshal(claimOut, &m)
+        //json.Unmarshal(GetClaimInfo(stub,val), &m)
+		    if m.PatientId == patientID {
+          accountIndex = append(tempSlice , accountIndex[i])
+        }
+    }
+    jsonAsBytes, _ := json.Marshal(accountIndex)
+    return jsonAsBytes, nil
 }
 
 func GetClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
