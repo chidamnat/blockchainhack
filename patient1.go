@@ -120,7 +120,7 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
     var cost = args[9]
     var procedureStatus = args[10]
 
-    claimInfoInput := `{ "id": "` + claimId + `","propertyId": "` + propertyId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt  `", "icd10": "` + icd10 `", "ndc": "` + ndc `", "personalInfo": "` + personalInfo `","insuranceInfo": "` + insuranceInfo `", "cost": "` + cost `", "procedureStatus": "` + procedureStatus + `"}`
+    claimInfoInput := `{ "id": "` + claimId + `","propertyId": "` + propertyId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt + `", "icd10": "` + icd10 + `", "ndc": "` + ndc + `", "personalInfo": "` + personalInfo + `","insuranceInfo": "` + insuranceInfo + `", "cost": "` + cost + `", "procedureStatus": "` + procedureStatus + `"}`
     //var claimInfoInput = args[1]
 
     err := stub.PutState(claimId, []byte(claimInfoInput))
