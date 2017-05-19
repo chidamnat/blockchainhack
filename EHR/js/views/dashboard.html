@@ -1,0 +1,66 @@
+<!--
+ Copyright (c) 2014, 2017, Oracle and/or its affiliates.
+ The Universal Permissive License (UPL), Version 1.0
+ -->
+<div class="oj-hybrid-padding">
+  <h3>EHR Dashboard</h3>
+  <div class="oj-panel">
+      <div class="oj-flex">
+          <div class="oj-flex-item oj-middle" style="display:inlineblock;">
+            <h1>   EHR Block</h1>
+          </div>
+          <div class="oj-flex-item" style="display:inline-block;">
+              
+              <table id="table" summary="Claims List" aria-label="Claims Table"
+                                    data-bind="ojComponent: {component: 'ojTable', 
+                                data: claims, 
+                                columnsDefault: {sortable: 'none'}, 
+                                columns: [{headerText: 'Claim Id', 
+                                           field: 'claimId'},
+                                          {headerText: 'Patient Id', 
+                                           template:'patTemp'},
+                                          {headerText: 'Provider Id', 
+                                           field: 'npId'},
+                                          {headerText: 'Procedure Id', 
+                                           field: 'cptId'},
+                                          {headerText: 'Diagnosis Code', 
+                                           field: 'icdId'},
+                                       {headerText: 'Medication', 
+                                           field: 'ndc'},
+                                       {headerText: 'Cost', 
+                                            field:'cost'},
+                                        {headerText: 'Date', 
+                                            field:'date'}
+                                        ]}">
+              </table>
+          </div>
+      </div>
+  </div>
+</div>
+ 
+ <!--patient details -->
+ 
+ <div class="" style="display:none;height:400px;width:450px;overflow: hidden" id="patientPopup"
+       data-bind="ojComponent:{component: 'ojPopup'}" >
+     <div style="display:inline-block">
+    <h3>Patient procedure & cost</h3>
+    <div class="" id="patVisitCost" data-bind="ojComponent:{
+                    component:'ojChart',
+                    type:'bar',
+                    series:visitCostSeries,
+                    groups:visitCostGroup,rootAttributes:{style:'height:300px;width:400px;'},
+                    yAxis: {title: ko.toJS('Cost')},
+                    xAxis: {title: ko.toJS('Procedure')},legend: {position: 'bottom'},
+                    styleDefaults: {markerDisplayed: 'on', markerSize: 7, dataItemGaps: '0%'},
+                    valueFormats: [{type: 'series', tooltipLabel: 'Treatment'}, {type: 'group', tooltipLabel: ko.toJS('Procedure')}, {type: 'y', tooltipLabel: ko.toJS('Cost')}]
+                    }" style=""> 
+    </div>
+  </div>
+ <!--end of details-->
+ <script type="text/html" id="patTemp">
+     <td>
+        <a tabindex="0" role="button" href="#" data-bind=
+        "click:showPatientMetrics,text:patientId,attr:{title:patientId,id:patientId}">
+        </a>
+    </td>
+</script>
