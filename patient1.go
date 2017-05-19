@@ -66,12 +66,29 @@ func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]
     }
 
     var patientID = args[0]
-    bytes, err := stub.GetState(patientID)
-    if err != nil {
-        logger.Error("Could not fetch patient info with id "+patientID+" from ledger", err)
-        return nil, err
+    // bytes, err := stub.GetState(patientID)
+    // if err != nil {
+    //     logger.Error("Could not fetch patient info with id "+patientID+" from ledger", err)
+    //     return nil, err
+    // }
+    // return bytes, nil
+    //get the account index
+  	accountsAsBytes, err := stub.GetState(accountIndexStr)
+  	if err != nil {
+  		return nil, errors.New("Failed to get account index")
+  	}
+  	var accountIndex []string
+  	json.Unmarshal(accountsAsBytes, &accountIndex)
+
+    for i,val := range accountIndex{
+        var cId []string
+        valClaim = json.Unmarshal(GetClaimnfo(stub,strings.Fields(val)), &pId)
+		    if valClaim.patientId == patientId {
+          accountIndex = append(accountIndex[i])
+        }
     }
-    return bytes, nil
+    jsonAsBytes, _ := json.Marshal(accountIndex)
+    return jsonAsBytes, nil
 }
 
 func GetClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
