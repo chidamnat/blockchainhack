@@ -29,13 +29,14 @@ type InsuranceInfo struct {
 
 type ClaimInfo struct {
     ClaimInfo              string        `json:"id"`
-    PatientId             string        `json:"propertyId"`
+    PatientId             string        `json:"patientId"`
     DateOfVisit           string        `json:"dateOfVisit"`
     NPI                   string        `json:"npi"`
     CPT                string        `json:"cpt"`
     ICD10                 string        `json:"icd10"`
     NDC                   string        `json:"ndc"`
-    PatientInfo           PatientInfo    `json:"personalInfo"`
+    //PatientInfo           PatientInfo    `json:"personalInfo"`
+    PatientInfo           string    `json:"personalInfo"`
     InsuranceInfo          InsuranceInfo `json:"insuranceInfo"`
     Cost                 string        `json:"cost"`
     ProcedureStatus      string        `json:"procedureStatus"`
@@ -109,18 +110,18 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
         return nil, errors.New("Expected at least two arguments for claim info creation.")
     }
     var claimId = args[0]
-    var propertyId = args[1]
+    var patientId = args[1]
     var dateOfVisit = args[2]
     var npi = args[3]
     var cpt = args[4]
     var icd10 = args[5]
     var ndc = args[6]
-    var personalInfo = GetPatientInfo(stub, args[7])
-    var insuranceInfo = args[8]
-    var cost = args[9]
-    var procedureStatus = args[10]
+    //var personalInfo = GetPatientInfo(stub, args[7])
+    var insuranceInfo = args[7]
+    var cost = args[8]
+    var procedureStatus = args[9]
 
-    claimInfoInput := `{ "id": "` + claimId + `","propertyId": "` + propertyId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt + `", "icd10": "` + icd10 + `", "ndc": "` + ndc + `", "personalInfo": "` + personalInfo + `","insuranceInfo": "` + insuranceInfo + `", "cost": "` + cost + `", "procedureStatus": "` + procedureStatus + `"}`
+    claimInfoInput := `{ "id": "` + claimId + `","patientId": "` + patientId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt + `", "icd10": "` + icd10 + `", "ndc": "` + ndc + `", "personalInfo": "` + personalInfo + `","insuranceInfo": "` + insuranceInfo + `", "cost": "` + cost + `", "procedureStatus": "` + procedureStatus + `"}`
     //var claimInfoInput = args[1]
 
     err := stub.PutState(claimId, []byte(claimInfoInput))
