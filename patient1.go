@@ -98,21 +98,16 @@ func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte,
         logger.Error("Could not save patient info to ledger", err)
         return nil, err
     }
-
-
     logger.Info("Successfully saved patient info.")
     return nil, nil
-
 }
 
 func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
     logger.Debug("Entering CreateClaimInfo")
-
     if len(args) < 2 {
         logger.Error("Invalid number of args")
         return nil, errors.New("Expected at least two arguments for claim info creation.")
     }
-
     var claimId = args[0]
     var propertyId = args[1]
     var dateOfVisit = args[2]
@@ -125,8 +120,7 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
     var cost = args[9]
     var procedureStatus = args[10]
 
-    claimInfoInput := `{ "id": "` + claimId + `","propertyId": "` + propertyId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `" ,"cpt": "` + cpt  `", "icd10": "` + icd10 `", "ndc": "` + ndc `", "personalInfo": "` + personalInfo `","insuranceInfo": "` + insuranceInfo `", "cost": "` + cost `", "procedureStatus": "` + procedureStatus `"}`
-
+    claimInfoInput := `{ "id": "` + claimId + `","propertyId": "` + propertyId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt  `", "icd10": "` + icd10 `", "ndc": "` + ndc `", "personalInfo": "` + personalInfo `","insuranceInfo": "` + insuranceInfo `", "cost": "` + cost `", "procedureStatus": "` + procedureStatus + `"}`
     //var claimInfoInput = args[1]
 
     err := stub.PutState(claimId, []byte(claimInfoInput))
