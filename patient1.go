@@ -64,8 +64,9 @@ func GetPatientClaimHistory(stub shim.ChaincodeStubInterface, args []string) ([]
         return nil, errors.New("Missing patient ID")
     }
 
-    var patientID = args[0]
+    patientID := args[0]
     var patientInfo PatientInfo
+
     patientInfoRaw, err := stub.GetState(patientID)
     json.Unmarshal(patientInfoRaw, &patientInfo)
     if err != nil {
@@ -226,6 +227,9 @@ func (t *SampleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
     }
     if function == "GetClaimInfo" {
         return GetClaimInfo(stub, args)
+    }
+    if function == "GetPatientClaimHistory" {
+        return GetPatientClaimHistory(stub, args)
     }
     return nil, nil
 }
