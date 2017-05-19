@@ -153,7 +153,7 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
   	json.Unmarshal(accountsAsBytes, &accountIndex)
 
     //append the index
-  	accountIndex = append(accountIndex, accountNo)
+  	accountIndex = append(accountIndex, claimId)
   	jsonAsBytes, _ := json.Marshal(accountIndex)
   	err = stub.PutState(accountIndexStr, jsonAsBytes)
 
