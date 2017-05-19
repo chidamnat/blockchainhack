@@ -74,8 +74,8 @@ func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte,
     var birthdate = args[3]
     var lastmodifieddate = args[4]
     var createdate = args[5]
-    patientInfoInput := `{ "state": "` + state + `", "birthdate": "` + birthdate + `", "lastmodifieddate": "` + lastmodifieddate + `" }`
-
+//    patientInfoInput := `{ "state": "` + state + `", "birthdate": "` + birthdate + `", "lastmodifieddate": "` + lastmodifieddate + `" }`
+    patientInfoInput := `{ "zipcd": "` + zipcd + `","state": "` + state + `", "birthdate": "` + birthdate + `", "lastmodifieddate": "` + lastmodifieddate + `" ,"createdate": "` + createdate + `"}`
 
     err := stub.PutState(patientID, []byte(patientInfoInput))
     if err != nil {
