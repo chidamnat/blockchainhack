@@ -87,7 +87,7 @@ func GetCompletePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]
         claimOut, _ = GetClaimInfo(stub,strings.Fields(val))
         json.Unmarshal(claimOut, &m)
         //json.Unmarshal(GetClaimInfo(stub,val), &m)
-		    if m.PatientId == patientId {
+		    if m.PatientId == patientID {
           accountIndex = append(accountIndex[i])
         }
     }
