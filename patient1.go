@@ -71,7 +71,7 @@ func CreatePatientInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte,
     //var patientInfoInput = args[1]
     var zipcd = args[1]
     var state = args[2]
-    var brithdate = args[3]
+    var birthdate = args[3]
     var lastmodifieddate = args[4]
     var createdate = args[5]
     patientInfoInput := `{ "state": "` + state + `", "birthdate": "` + birthdate + `", "lastmodifieddate": "` + lastmodifieddate + `" }`
