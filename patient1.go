@@ -28,16 +28,17 @@ type InsuranceInfo struct {
 }
 
 type ClaimInfo struct {
-    ClaimInfo              string        `json:"id"`
-    PatientId             string        `json:"patientId"`
-    DateOfVisit           string        `json:"dateOfVisit"`
-    NPI                   string        `json:"npi"`
-    CPT                string        `json:"cpt"`
-    ICD10                 string        `json:"icd10"`
-    NDC                   string        `json:"ndc"`
+    ClaimInfo             string       `json:"id"`
+    PatientId             string       `json:"patientId"`
+    DateOfVisit           string       `json:"dateOfVisit"`
+    NPI                   string       `json:"npi"`
+    CPT                   string       `json:"cpt"`
+    ICD10                 string       `json:"icd10"`
+    NDC                   string       `json:"ndc"`
     //PatientInfo           PatientInfo    `json:"personalInfo"`
-    PatientInfo           string    `json:"personalInfo"`
-    InsuranceInfo          InsuranceInfo `json:"insuranceInfo"`
+    PatientInfo           string       `json:"personalInfo"`
+    //InsuranceInfo          InsuranceInfo `json:"insuranceInfo"`
+    InsuranceInfo        string        `json:"insuranceInfo"`
     Cost                 string        `json:"cost"`
     ProcedureStatus      string        `json:"procedureStatus"`
 }
@@ -65,7 +66,7 @@ func GetClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, erro
 
     if len(args) < 1 {
         logger.Error("Invalid number of arguments")
-        return nil, errors.New("Missing patient ID")
+        return nil, errors.New("Missing Claim ID")
     }
 
     var claimId = args[0]
