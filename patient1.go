@@ -122,7 +122,7 @@ func CreateClaimInfo(stub shim.ChaincodeStubInterface, args []string) ([]byte, e
     var cost = args[8]
     var procedureStatus = args[9]
 
-    claimInfoInput := `{ "id": "` + claimId + `","patientId": "` + patientId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt + `", "icd10": "` + icd10 + `", "ndc": "` + ndc +  `","insuranceInfo": "` + insuranceInfo + `", "cost": "` + cost + `", "procedureStatus": "` + procedureStatus + `"}`
+    claimInfoInput := `{ "patientId": "` + patientId + `", "dateOfVisit": "` + dateOfVisit + `", "npi": "` + npi + `", "cpt": "` + cpt + `", "icd10": "` + icd10 + `", "ndc": "` + ndc +  `","insuranceInfo": "` + insuranceInfo + `", "cost": "` + cost + `", "procedureStatus": "` + procedureStatus + `"}`
     //var claimInfoInput = args[1]
 
     err := stub.PutState(claimId, []byte(claimInfoInput))
@@ -179,15 +179,6 @@ func (t *SampleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
     return nil, nil
 }
 
-// func GetCertAttribute(stub shim.ChaincodeStubInterface, attributeName string) (string, error) {
-//     logger.Debug("Entering GetCertAttribute")
-//     attr, err := stub.ReadCertAttribute(attributeName)
-//     if err != nil {
-//         return "", errors.New("Couldn't get attribute " + attributeName + ". Error: " + err.Error())
-//     }
-//     attrString := string(attr)
-//     return attrString, nil
-// }
 
 func (t *SampleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
     if function == "CreatePatientInfo" {
@@ -200,10 +191,10 @@ func (t *SampleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
     return nil, nil
 }
 
-type customEvent struct {
-    Type       string `json:"type"`
-    Decription string `json:"description"`
-}
+// type customEvent struct {
+//     Type       string `json:"type"`
+//     Decription string `json:"description"`
+// }
 
 func main() {
 
